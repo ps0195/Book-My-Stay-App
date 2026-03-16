@@ -1,100 +1,70 @@
-// Abstract Room class
-abstract class Room {
-    private int numberOfBeds;
-    private double size;
-    private double price;
+import java.util.HashMap;
+import java.util.Map;
 
-    public Room(int numberOfBeds, double size, double price) {
-        this.numberOfBeds = numberOfBeds;
-        this.size = size;
-        this.price = price;
+// RoomInventory class - manages centralized inventory
+class RoomInventory {
+
+    private HashMap<String, Integer> inventory;
+
+    // Constructor initializes inventory
+    public RoomInventory() {
+        inventory = new HashMap<>();
     }
 
-    public int getNumberOfBeds() {
-        return numberOfBeds;
+    // Register room type with available count
+    public void addRoomType(String roomType, int count) {
+        inventory.put(roomType, count);
     }
 
-    public double getSize() {
-        return size;
+    // Retrieve current availability
+    public int getAvailability(String roomType) {
+        return inventory.getOrDefault(roomType, 0);
     }
 
-    public double getPrice() {
-        return price;
+    // Update availability in a controlled way
+    public void updateAvailability(String roomType, int newCount) {
+        if (inventory.containsKey(roomType)) {
+            inventory.put(roomType, newCount);
+        } else {
+            System.out.println("Room type not found in inventory.");
+        }
     }
 
-    public abstract String getRoomType();
-
-    public void displayRoomDetails() {
-        System.out.println("Room Type: " + getRoomType());
-        System.out.println("Beds: " + numberOfBeds);
-        System.out.println("Size: " + size + " sq ft");
-        System.out.println("Price: $" + price);
-    }
-}
-
-// Single Room class
-class SingleRoom extends Room {
-
-    public SingleRoom() {
-        super(1, 200, 100);
-    }
-
-    @Override
-    public String getRoomType() {
-        return "Single Room";
+    // Display complete inventory
+    public void displayInventory() {
+        System.out.println("Current Room Inventory:");
+        for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
+        }
     }
 }
 
-// Double Room class
-class DoubleRoom extends Room {
-
-    public DoubleRoom() {
-        super(2, 350, 180);
-    }
-
-    @Override
-    public String getRoomType() {
-        return "Double Room";
-    }
-}
-
-// Suite Room class
-class SuiteRoom extends Room {
-
-    public SuiteRoom() {
-        super(3, 600, 350);
-    }
-
-    @Override
-    public String getRoomType() {
-        return "Suite Room";
-    }
-}
-
-// Main Application
+// Main application
 public class Main {
     public static void main(String[] args) {
 
-        // Create room objects
-        Room single = new SingleRoom();
-        Room doubleRoom = new DoubleRoom();
-        Room suite = new SuiteRoom();
+        // Initialize inventory
+        RoomInventory inventory = new RoomInventory();
 
-        // Static availability variables
-        int singleAvailable = 5;
-        int doubleAvailable = 3;
-        int suiteAvailable = 2;
+        // Register room types
+        inventory.addRoomType("Single Room", 5);
+        inventory.addRoomType("Double Room", 3);
+        inventory.addRoomType("Suite Room", 2);
 
-        // Display details
-        single.displayRoomDetails();
-        System.out.println("Available Rooms: " + singleAvailable);
+        // Display inventory
+        inventory.displayInventory();
+
         System.out.println();
 
-        doubleRoom.displayRoomDetails();
-        System.out.println("Available Rooms: " + doubleAvailable);
+        // Retrieve availability
+        System.out.println("Single Room Available: " + inventory.getAvailability("Single Room"));
+
         System.out.println();
 
-        suite.displayRoomDetails();
-        System.out.println("Available Rooms: " + suiteAvailable);
+        // Update availability
+        inventory.updateAvailability("Single Room", 4);
+
+        // Display updated inventory
+        inventory.displayInventory();
     }
 }
