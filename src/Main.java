@@ -1,61 +1,81 @@
 import java.util.*;
 
-// Core Reservation (unchanged)
+// Reservation class
 class Reservation {
     String id;
-    double basePrice;
+    String guestName;
+    double amount;
 
-    Reservation(String id, double basePrice) {
+    Reservation(String id, String guestName, double amount) {
         this.id = id;
-        this.basePrice = basePrice;
+        this.guestName = guestName;
+        this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return id + " | " + guestName + " | ₹" + amount;
     }
 }
 
-// Add-On Service
-class AddOnService {
-    String name;
-    double price;
+// Booking History (stores confirmed bookings)
+class BookingHistory {
+    private List<Reservation> history = new ArrayList<>();
 
-    AddOnService(String name, double price) {
-        this.name = name;
-        this.price = price;
+    // Add confirmed booking
+    void addReservation(Reservation r) {
+        history.add(r);
+    }
+
+    // Get all bookings
+    List<Reservation> getAllReservations() {
+        return history;
     }
 }
 
-// Manager
-class AddOnServiceManager {
-    Map<String, List<AddOnService>> map = new HashMap<>();
+// Report Service (read-only operations)
+class BookingReportService {
 
-    void addService(String resId, AddOnService service) {
-        map.computeIfAbsent(resId, k -> new ArrayList<>()).add(service);
-    }
-
-    double getTotalCost(String resId) {
-        double total = 0;
-        List<AddOnService> list = map.get(resId);
-        if (list != null) {
-            for (AddOnService s : list) {
-                total += s.price;
-            }
+    // Print all bookings
+    void printAllBookings(List<Reservation> list) {
+        System.out.println("Booking History:");
+        for (Reservation r : list) {
+            System.out.println(r);
         }
-        return total;
+    }
+
+    // Generate summary
+    void generateSummary(List<Reservation> list) {
+        int totalBookings = list.size();
+        double totalRevenue = 0;
+
+        for (Reservation r : list) {
+            totalRevenue += r.amount;
+        }
+
+        System.out.println("\nSummary Report:");
+        System.out.println("Total Bookings: " + totalBookings);
+        System.out.println("Total Revenue: ₹" + totalRevenue);
     }
 }
 
 // Main
 public class Main {
     public static void main(String[] args) {
-        Reservation r = new Reservation("R1", 5000);
 
-        AddOnServiceManager manager = new AddOnServiceManager();
+        BookingHistory history = new BookingHistory();
 
-        manager.addService("R1", new AddOnService("Breakfast", 500));
-        manager.addService("R1", new AddOnService("Pickup", 1000));
+        // Simulate confirmed bookings
+        history.addReservation(new Reservation("R1", "Arun", 5000));
+        history.addReservation(new Reservation("R2", "Divya", 6500));
+        history.addReservation(new Reservation("R3", "Kumar", 4000));
 
-        double extra = manager.getTotalCost("R1");
+        // Admin views reports
+        BookingReportService report = new BookingReportService();
 
-        System.out.println("Base Price: " + r.basePrice);
-        System.out.println("Extra Cost: " + extra);
-        System.out.println("Total Price: " + (r.basePrice + extra));
+        List<Reservation> data = history.getAllReservations();
+
+        report.printAllBookings(data);
+        report.generateSummary(data);
     }
 }
